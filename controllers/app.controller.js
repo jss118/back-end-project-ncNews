@@ -25,6 +25,11 @@ exports.updateVotes = (req, res, next) => {
   const id = req.params.article_id;
   const votes = req.body.inc_votes;
   fetchUpdatedArticle(id, votes)
-    .then(([article]) => res.send(article))
+    .then(([article]) => {
+      if (!article) {
+        res.status(404).send({ msg: "Sorry, endpoint doesn't exist" });
+      }
+      res.send(article);
+    })
     .catch(next);
 };
