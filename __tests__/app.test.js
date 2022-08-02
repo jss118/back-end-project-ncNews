@@ -9,13 +9,18 @@ afterAll(() => db.end());
 beforeEach(() => seed(testData));
 
 describe("ALL /*", () => {
-  test("Status: 404 with an error message for a none-existing endpoint", () => {
+  test("Status: 404 with an error message for an invalid endpoint", () => {
     return request(app)
       .get("/api/invalid-endpoint")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Sorry, request invalid..");
       });
+  });
+  test("Status: 404 with an error message for a valid, but none-existing endpoint", async () => {
+    const { body } = await request(app).get("/api/articles/1000").expect(404);
+
+    expect(body.msg).toBe("Sorry, endpoint doesn't exist");
   });
 });
 
