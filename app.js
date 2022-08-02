@@ -1,11 +1,19 @@
 const express = require("express");
-const { getTopics, getArticleById } = require("./controllers/app.controller");
+const {
+  getTopics,
+  getArticleById,
+  updateVotes,
+} = require("./controllers/app.controller");
 
 const app = express();
+
+app.use(express.json());
 
 app.get("/api/topics", getTopics);
 
 app.get("/api/articles/:article_id", getArticleById);
+
+app.patch("/api/articles/:article_id", updateVotes);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
