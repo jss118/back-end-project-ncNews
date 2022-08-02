@@ -8,7 +8,18 @@ afterAll(() => db.end());
 
 beforeEach(() => seed(testData));
 
-describe("/api/topics", () => {
+describe("ALL /*", () => {
+  test("Status: 404 with an error message for an invalid endpoint", () => {
+    return request(app)
+      .get("/api/invalid-endpoint")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Sorry, request invalid..");
+      });
+  });
+});
+
+describe("GET /api/topics", () => {
   test("Status: 200 GETS array of topic objects", () => {
     return request(app)
       .get("/api/topics")
@@ -23,12 +34,26 @@ describe("/api/topics", () => {
         });
       });
   });
-  test("Status: 404 with an error message for if the endpoint the user is searching for doesn't exist in the database", () => {
-    return request(app)
-      .get("/api/invalid-endpoint")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Sorry, request invalid..");
-      });
+});
+
+describe("GET /api/articles/:article_id", () => {
+  test("Status: 200 GETS an article object with the correct properties", async () => {
+    const { body } = await request(app).get("/api/articles/1").expect(200);
+    expect(typeof body).toBe("object");
+    expect(body.author).toEqual(expect.any(String));
+    expect(body.title).toEqual(expect.any(String));
+    expect(body.article_id).toEqual(expect.any(Number));
+    expect(body.topic).toEqual(expect.any(String));
+    expect(body.created_at).toBe("2020-07-09T20:11:00.000Z");
+    expect(body.votes).toEqual(expect.any(Number));
+  });
+  test("Status: 400 recieves an error when a bad request is made", async () => {
+    const { body } = await request(app).get("/api/articles/one").expect(400);
+    expect(body.msg).toBe("Bad request");
+  });
+  test("Status: 404 with an error message for a valid, but none-existing endpoint", async () => {
+    const { body } = await request(app).get("/api/articles/1000").expect(404);
+
+    expect(body.msg).toBe("Sorry, endpoint doesn't exist");
   });
 });
