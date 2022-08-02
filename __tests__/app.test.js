@@ -17,11 +17,6 @@ describe("ALL /*", () => {
         expect(body.msg).toBe("Sorry, request invalid..");
       });
   });
-  test("Status: 404 with an error message for a valid, but none-existing endpoint", async () => {
-    const { body } = await request(app).get("/api/articles/1000").expect(404);
-
-    expect(body.msg).toBe("Sorry, endpoint doesn't exist");
-  });
 });
 
 describe("GET /api/topics", () => {
@@ -55,5 +50,10 @@ describe("GET /api/articles/:article_id", () => {
   test("Status: 400 recieves an error when a bad request is made", async () => {
     const { body } = await request(app).get("/api/articles/one").expect(400);
     expect(body.msg).toBe("Bad request");
+  });
+  test("Status: 404 with an error message for a valid, but none-existing endpoint", async () => {
+    const { body } = await request(app).get("/api/articles/1000").expect(404);
+
+    expect(body.msg).toBe("Sorry, endpoint doesn't exist");
   });
 });
