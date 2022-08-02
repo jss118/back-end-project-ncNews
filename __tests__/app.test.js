@@ -57,3 +57,30 @@ describe("GET /api/articles/:article_id", () => {
     expect(body.msg).toBe("Sorry, endpoint doesn't exist");
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("Status: 200 responds with the updated article which has 1 vote added to the votes property", async () => {
+    const votesUpdate = { inc_votes: 1 };
+    const { body } = await request(app)
+      .patch("/api/articles/1")
+      .send(votesUpdate)
+      .expect(200);
+    expect(body.votes).toBe(101);
+  });
+  test("Status: 200 responds with the updated article with -1 votes when 101 votes are taken away from the votes property", async () => {
+    const votesUpdate = { inc_votes: -101 };
+    const { body } = await request(app)
+      .patch("/api/articles/1")
+      .send(votesUpdate)
+      .expect(200);
+    expect(body.votes).toBe(-1);
+  });
+  test("Status: 400 responds with msg object when vote update object has and invalid value type", async () => {
+    const votesUpdate = { inc_votes: "one" };
+    const { body } = await request(app)
+      .patch("/api/articles/1")
+      .send(votesUpdate)
+      .expect(400);
+    expect(body.msg).toBe("Bad request");
+  });
+});
