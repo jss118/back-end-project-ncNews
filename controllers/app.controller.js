@@ -2,6 +2,7 @@ const {
   fetchTopics,
   fetchArticle,
   fetchUpdatedArticle,
+  fetchUsers,
 } = require("../models/app.model");
 
 exports.getTopics = (req, res) => {
@@ -12,24 +13,18 @@ exports.getArticleById = (req, res, next) => {
   const id = req.params.article_id;
 
   fetchArticle(id)
-    .then(([article]) => {
-      if (!article) {
-        res.status(404).send({ msg: "Sorry, endpoint doesn't exist" });
-      }
-      res.send(article);
-    })
-    .catch(next);
+    .then(([article]) => res.send(article))
+    .catch(err => next(err));
 };
 
 exports.updateVotes = (req, res, next) => {
   const id = req.params.article_id;
   const votes = req.body.inc_votes;
   fetchUpdatedArticle(id, votes)
-    .then(([article]) => {
-      if (!article) {
-        res.status(404).send({ msg: "Sorry, endpoint doesn't exist" });
-      }
-      res.send(article);
-    })
-    .catch(next);
+    .then(([article]) => res.send(article))
+    .catch(err => next(err));
+};
+
+exports.getUsers = (req, res) => {
+  fetchUsers().then(users => res.send(users));
 };

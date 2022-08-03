@@ -44,7 +44,7 @@ describe("GET /api/articles/:article_id", () => {
     expect(body.title).toEqual(expect.any(String));
     expect(body.article_id).toEqual(expect.any(Number));
     expect(body.topic).toEqual(expect.any(String));
-    expect(body.created_at).toBe("2020-07-09T20:11:00.000Z");
+    expect(body.created_at).toEqual(expect.any(String));
     expect(body.votes).toEqual(expect.any(Number));
   });
   test("Status: 400 recieves an error when a bad request is made", async () => {
@@ -54,7 +54,7 @@ describe("GET /api/articles/:article_id", () => {
   test("Status: 404 with an error message for a valid, but none-existing endpoint", async () => {
     const { body } = await request(app).get("/api/articles/1000").expect(404);
 
-    expect(body.msg).toBe("Sorry, endpoint doesn't exist");
+    expect(body.msg).toBe("article does not exist");
   });
 });
 
@@ -101,6 +101,18 @@ describe("PATCH /api/articles/:article_id", () => {
       .patch("/api/articles/200")
       .send(votesUpdate)
       .expect(404);
-    expect(body.msg).toBe("Sorry, endpoint doesn't exist");
+    expect(body.msg).toBe("article does not exist");
+  });
+});
+
+describe("GET /api/users", () => {
+  test("Status: 200 responds with an array of user objects", async () => {
+    const { body } = await request(app).get("/api/users").expect(200);
+    expect(body).toHaveLength(4);
+    body.forEach(user => {
+      expect(user.username).toEqual(expect.any(String));
+      expect(user.name).toEqual(expect.any(String));
+      expect(user.avatar_url).toEqual(expect.any(String));
+    });
   });
 });
