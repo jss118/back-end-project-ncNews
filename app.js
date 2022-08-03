@@ -3,6 +3,7 @@ const {
   getTopics,
   getArticleById,
   updateVotes,
+  getUsers,
 } = require("./controllers/app.controller");
 
 const app = express();
@@ -15,12 +16,23 @@ app.get("/api/articles/:article_id", getArticleById);
 
 app.patch("/api/articles/:article_id", updateVotes);
 
+app.get("/api/users", getUsers);
+
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Bad request" });
   } else {
     next(err);
   }
+});
+app.use((err, req, res, next) => {
+  if (err.status) {
+    res.status(404).send({ status: err.status, msg: err.msg });
+  } else next(err);
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).send({ msg: "internal server error" });
 });
 
 app.all("*", (req, res) => {
