@@ -46,6 +46,13 @@ describe("GET /api/articles/:article_id", () => {
     expect(body.topic).toEqual(expect.any(String));
     expect(body.created_at).toEqual(expect.any(String));
     expect(body.votes).toEqual(expect.any(Number));
+    expect(body.comment_count).toEqual(expect.any(Number));
+  });
+  test("Status: 200 Gets an article object which now includes a comment_count property with the value of the total amount of comments for the article with the same article_id", async () => {
+    const {
+      body: { comment_count },
+    } = await request(app).get("/api/articles/1").expect(200);
+    expect(comment_count).toBe(11);
   });
   test("Status: 400 recieves an error when a bad request is made", async () => {
     const { body } = await request(app).get("/api/articles/one").expect(400);

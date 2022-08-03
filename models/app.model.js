@@ -5,14 +5,28 @@ exports.fetchTopics = () => {
 };
 
 exports.fetchArticle = id => {
-  return db
+  const commentCount = db
+    .query("SELECT * FROM comments WHERE article_id = $1", [id])
+    .then(({ rows }) => {
+      const count = rows.length;
+      return count;
+    });
+
+  const article = db
     .query("SELECT * FROM articles WHERE article_id = $1;", [id])
     .then(({ rows }) => {
-      if (rows.length === 0) {
+      if (!rows.length) {
         return Promise.reject({ status: 404, msg: "article does not exist" });
       }
       return rows;
     });
+
+  return Promise.all([article, commentCount]).then(
+    ([[article], commentCount]) => {
+      article.comment_count = commentCount;
+      return article;
+    }
+  );
 };
 
 exports.fetchUpdatedArticle = (id, votes) => {
@@ -22,7 +36,7 @@ exports.fetchUpdatedArticle = (id, votes) => {
       [votes, id]
     )
     .then(({ rows }) => {
-      if (rows.length === 0) {
+      if (!rows.length) {
         return Promise.reject({ status: 404, msg: "article does not exist" });
       }
       return rows;
