@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
+require("jest-sorted");
 
 afterAll(() => db.end());
 
@@ -120,6 +121,25 @@ describe("GET /api/users", () => {
       expect(user.username).toEqual(expect.any(String));
       expect(user.name).toEqual(expect.any(String));
       expect(user.avatar_url).toEqual(expect.any(String));
+    });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("Status 200 responds with an array of article objects", async () => {
+    const { body } = await request(app).get("/api/articles").expect(200);
+
+    body.forEach(article => {
+      expect(article.author).toEqual(expect.any(String));
+      expect(article.title).toEqual(expect.any(String));
+      expect(article.article_id).toEqual(expect.any(Number));
+      expect(article.topic).toEqual(expect.any(String));
+      expect(article.created_at).toEqual(expect.any(String));
+      expect(article.votes).toEqual(expect.any(Number));
+      expect(article.comment_count).toEqual(expect.any(Number));
+    });
+    expect(body).toBeSortedBy("created_at", {
+      descending: true,
     });
   });
 });
