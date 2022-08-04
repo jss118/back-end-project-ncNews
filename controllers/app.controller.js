@@ -3,6 +3,7 @@ const {
   fetchArticle,
   fetchUpdatedArticle,
   fetchUsers,
+  fetchArticles,
 } = require("../models/app.model");
 
 exports.getTopics = (req, res) => {
@@ -29,4 +30,8 @@ exports.updateVotes = (req, res, next) => {
 
 exports.getUsers = (req, res) => {
   fetchUsers().then(users => res.send(users));
+};
+
+exports.getArticles = (req, res) => {
+  fetchArticles().then(articles => res.send(articles));
 };
