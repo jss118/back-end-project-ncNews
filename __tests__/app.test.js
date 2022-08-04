@@ -164,4 +164,10 @@ describe("GET /api/articles/:article_id/comments", () => {
     expect(body.status).toBe(404);
     expect(body.msg).toBe("article does not exist");
   });
+  test("Status: 400 responds with an error for an invalid id", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/articleone/comments")
+      .expect(400);
+    expect(body.msg).toBe("Bad request");
+  });
 });
