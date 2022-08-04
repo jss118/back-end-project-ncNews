@@ -6,7 +6,7 @@ const {
   fetchArticles,
 } = require("../models/app.model");
 
-exports.getTopics = (req, res, next) => {
+exports.getTopics = (req, res) => {
   fetchTopics().then(topics => res.send(topics));
 };
 
