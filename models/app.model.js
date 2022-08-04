@@ -1,32 +1,23 @@
 const db = require("../db/connection");
+const articles = require("../db/data/test-data/articles");
 
 exports.fetchTopics = () => {
   return db.query("SELECT * FROM topics;").then(({ rows }) => rows);
 };
 
 exports.fetchArticle = id => {
-  const commentCount = db
-    .query("SELECT * FROM comments WHERE article_id = $1", [id])
-    .then(({ rows }) => {
-      const count = rows.length;
-      return count;
-    });
-
-  const article = db
-    .query("SELECT * FROM articles WHERE article_id = $1;", [id])
+  return db
+    .query(
+      "SELECT articles.*, COUNT(comments.article_id)::INT AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id ;",
+      [id]
+    )
     .then(({ rows }) => {
       if (!rows.length) {
         return Promise.reject({ status: 404, msg: "article does not exist" });
       }
+
       return rows;
     });
-
-  return Promise.all([article, commentCount]).then(
-    ([[article], commentCount]) => {
-      article.comment_count = commentCount;
-      return article;
-    }
-  );
 };
 
 exports.fetchUpdatedArticle = (id, votes) => {

@@ -13,7 +13,7 @@ exports.getArticleById = (req, res, next) => {
   const id = req.params.article_id;
 
   fetchArticle(id)
-    .then(article => {
+    .then(([article]) => {
       res.send(article);
     })
     .catch(err => next(err));
