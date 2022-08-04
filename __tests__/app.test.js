@@ -143,3 +143,25 @@ describe("GET /api/articles", () => {
     });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("Status: 200 responds with array of comment objects, all of which the article_id matches the id in the end point", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/1/comments")
+      .expect(200);
+    body.forEach(comment => {
+      expect(comment.comment_id).toEqual(expect.any(Number));
+      expect(comment.votes).toEqual(expect.any(Number));
+      expect(comment.created_at).toEqual(expect.any(String));
+      expect(comment.author).toEqual(expect.any(String));
+      expect(comment.body).toEqual(expect.any(String));
+    });
+  });
+  test("Status: 404 responds with an error for a valid but non-existing endpoint", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/200/comments")
+      .expect(404);
+    expect(body.status).toBe(404);
+    expect(body.msg).toBe("article does not exist");
+  });
+});
