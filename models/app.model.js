@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const articles = require("../db/data/test-data/articles");
 
 exports.fetchTopics = () => {
   return db.query("SELECT * FROM topics;").then(({ rows }) => rows);
@@ -6,11 +7,15 @@ exports.fetchTopics = () => {
 
 exports.fetchArticle = id => {
   return db
-    .query("SELECT * FROM articles WHERE article_id = $1;", [id])
+    .query(
+      "SELECT articles.*, COUNT(comments.article_id)::INT AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id ;",
+      [id]
+    )
     .then(({ rows }) => {
-      if (rows.length === 0) {
+      if (!rows.length) {
         return Promise.reject({ status: 404, msg: "article does not exist" });
       }
+
       return rows;
     });
 };
@@ -22,7 +27,7 @@ exports.fetchUpdatedArticle = (id, votes) => {
       [votes, id]
     )
     .then(({ rows }) => {
-      if (rows.length === 0) {
+      if (!rows.length) {
         return Promise.reject({ status: 404, msg: "article does not exist" });
       }
       return rows;
