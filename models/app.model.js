@@ -66,21 +66,14 @@ exports.fetchComments = id => {
 };
 
 exports.sendComment = (id, comment) => {
-  return db
-    .query(
-      "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *",
-      [comment.author, comment.body, id]
-    )
-    .then(({ rows }) => {
-      const articleExists = checkArticleExists(id);
-      const usernameExists = checkUsernameExists(comment.author);
-
-      return Promise.all([articleExists, usernameExists]).then(
-        ([result1, result2]) => {
-          if (result1 && result2) {
-            return rows;
-          }
-        }
+  const articleExists = checkArticleExists(id);
+  const usernameExists = checkUsernameExists(comment.author);
+  return Promise.all([articleExists, usernameExists])
+    .then(() => {
+      return db.query(
+        "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *",
+        [comment.author, comment.body, id]
       );
-    });
+    })
+    .then(({ rows }) => rows);
 };
