@@ -207,6 +207,18 @@ describe("POST /api/articles/:article_id/comments", () => {
 
     expect(body.msg).toBe("article does not exist");
   });
+  test("Status: 404 responds with error when a username does not exist", async () => {
+    const newComment = {
+      author: "kingCoder",
+      body: "make way, king of code coming through!",
+    };
+    const { body } = await request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(404);
+    expect(body.msg).toBe(`user does not exist`);
+  });
+
   test("Status 400 responds with error when a user tries to post a comment to an invalid article_id", async () => {
     const newComment = {
       author: "icellusedkars",
