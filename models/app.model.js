@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const articles = require("../db/data/test-data/articles");
+const { checkArticleExists } = require("../dbUtils/dbUtils");
 
 exports.fetchTopics = () => {
   return db.query("SELECT * FROM topics;").then(({ rows }) => rows);
@@ -46,4 +46,18 @@ exports.fetchArticles = () => {
       "SELECT articles.*, COUNT(comments.article_id)::INT AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ORDER BY created_at DESC;"
     )
     .then(({ rows }) => rows);
+};
+
+exports.fetchComments = id => {
+  return db
+    .query("SELECT * FROM comments WHERE article_id = $1", [id])
+    .then(({ rows }) => {
+      if (rows.length) {
+        return rows;
+      } else {
+        return checkArticleExists(id).then(exists => {
+          if (exists) return rows;
+        });
+      }
+    });
 };

@@ -143,3 +143,37 @@ describe("GET /api/articles", () => {
     });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("Status: 200 responds with array of comment objects, all of which the article_id matches the id in the end point", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/1/comments")
+      .expect(200);
+    body.forEach(comment => {
+      expect(comment.comment_id).toEqual(expect.any(Number));
+      expect(comment.votes).toEqual(expect.any(Number));
+      expect(comment.created_at).toEqual(expect.any(String));
+      expect(comment.author).toEqual(expect.any(String));
+      expect(comment.body).toEqual(expect.any(String));
+    });
+  });
+  test("Status: 200 responds with an empty array for a valid article that has no comments", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/8/comments")
+      .expect(200);
+    expect(body.length).toBe(0);
+  });
+  test("Status: 404 responds with an error for a valid but non-existing article", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/200/comments")
+      .expect(404);
+    expect(body.status).toBe(404);
+    expect(body.msg).toBe("article does not exist");
+  });
+  test("Status: 400 responds with an error for an invalid id", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/articleone/comments")
+      .expect(400);
+    expect(body.msg).toBe("Bad request");
+  });
+});

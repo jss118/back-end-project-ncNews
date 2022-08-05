@@ -5,6 +5,7 @@ const {
   updateVotes,
   getUsers,
   getArticles,
+  getComments,
 } = require("./controllers/app.controller");
 
 const app = express();
@@ -21,6 +22,8 @@ app.get("/api/users", getUsers);
 
 app.get("/api/articles", getArticles);
 
+app.get("/api/articles/:article/comments", getComments);
+
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Bad request" });
@@ -35,6 +38,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log(err);
   res.status(500).send({ msg: "internal server error" });
 });
 
