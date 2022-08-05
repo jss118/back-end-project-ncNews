@@ -10,9 +10,9 @@ afterAll(() => db.end());
 beforeEach(() => seed(testData));
 
 describe("ALL /*", () => {
-  test("Status: 404 with an error message for an invalid endpoint", () => {
+  test("Status: 404 with an error message for a non-existing endpoint", () => {
     return request(app)
-      .get("/api/invalid-endpoint")
+      .get("/api/non-existing-endpoint")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Sorry, request invalid..");
@@ -167,12 +167,66 @@ describe("GET /api/articles/:article_id/comments", () => {
     const { body } = await request(app)
       .get("/api/articles/200/comments")
       .expect(404);
-    expect(body.status).toBe(404);
     expect(body.msg).toBe("article does not exist");
   });
   test("Status: 400 responds with an error for an invalid id", async () => {
     const { body } = await request(app)
       .get("/api/articles/articleone/comments")
+      .expect(400);
+    expect(body.msg).toBe("Bad request");
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("Status: 201 responds with the comment that was posted", async () => {
+    const newComment = {
+      author: "icellusedkars",
+      body: "make way, king of code coming through!",
+    };
+    const { body: comment } = await request(app)
+      .post("/api/articles/8/comments")
+      .send(newComment)
+      .expect(201);
+
+    expect(comment.author).toEqual(expect.any(String));
+    expect(comment.body).toEqual(expect.any(String));
+    expect(comment.comment_id).toEqual(expect.any(Number));
+    expect(comment.article_id).toEqual(expect.any(Number));
+    expect(comment.votes).toEqual(expect.any(Number));
+    expect(comment.created_at).toEqual(expect.any(String));
+  });
+  test("Status: 404 responds with error when a user tries to post a comment to a non-existing article_id", async () => {
+    const newComment = {
+      author: "icellusedkars",
+      body: "make way, king of code coming through!",
+    };
+    const { body } = await request(app)
+      .post("/api/articles/200/comments")
+      .send(newComment)
+      .expect(404);
+
+    expect(body.msg).toBe("article does not exist");
+  });
+  test("Status: 404 responds with error when a username does not exist", async () => {
+    const newComment = {
+      author: "kingCoder",
+      body: "make way, king of code coming through!",
+    };
+    const { body } = await request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(404);
+    expect(body.msg).toBe(`user does not exist`);
+  });
+
+  test("Status 400 responds with error when a user tries to post a comment to an invalid article_id", async () => {
+    const newComment = {
+      author: "icellusedkars",
+      body: "make way, king of code coming through!",
+    };
+    const { body } = await request(app)
+      .post("/api/articles/eight/comments")
+      .send(newComment)
       .expect(400);
     expect(body.msg).toBe("Bad request");
   });

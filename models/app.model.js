@@ -1,5 +1,8 @@
 const db = require("../db/connection");
-const { checkArticleExists } = require("../dbUtils/dbUtils");
+const {
+  checkArticleExists,
+  checkUsernameExists,
+} = require("../dbUtils/dbUtils");
 
 exports.fetchTopics = () => {
   return db.query("SELECT * FROM topics;").then(({ rows }) => rows);
@@ -60,4 +63,17 @@ exports.fetchComments = id => {
         });
       }
     });
+};
+
+exports.sendComment = (id, comment) => {
+  const articleExists = checkArticleExists(id);
+  const usernameExists = checkUsernameExists(comment.author);
+  return Promise.all([articleExists, usernameExists])
+    .then(() => {
+      return db.query(
+        "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *",
+        [comment.author, comment.body, id]
+      );
+    })
+    .then(({ rows }) => rows);
 };
