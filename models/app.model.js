@@ -61,3 +61,16 @@ exports.fetchComments = id => {
       }
     });
 };
+
+exports.sendComment = (id, comment) => {
+  return db
+    .query(
+      "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *",
+      [comment.author, comment.body, id]
+    )
+    .then(({ rows }) => {
+      return checkArticleExists(id).then(exists => {
+        if (exists) return rows;
+      });
+    });
+};
