@@ -157,7 +157,13 @@ describe("GET /api/articles/:article_id/comments", () => {
       expect(comment.body).toEqual(expect.any(String));
     });
   });
-  test("Status: 404 responds with an error for a valid but non-existing endpoint", async () => {
+  test("Status: 200 responds with an empty array for a valid article that has no comments", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/8/comments")
+      .expect(200);
+    expect(body.length).toBe(0);
+  });
+  test("Status: 404 responds with an error for a valid but non-existing article", async () => {
     const { body } = await request(app)
       .get("/api/articles/200/comments")
       .expect(404);

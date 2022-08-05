@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const articles = require("../db/data/test-data/articles");
+const { checkArticleExists } = require("../dbUtils/dbUtils");
 
 exports.fetchTopics = () => {
   return db.query("SELECT * FROM topics;").then(({ rows }) => rows);
@@ -50,11 +50,14 @@ exports.fetchArticles = () => {
 
 exports.fetchComments = id => {
   return db
-    .query("SELECT * FROM comments WHERE article_id =$1", [id])
+    .query("SELECT * FROM comments WHERE article_id = $1", [id])
     .then(({ rows }) => {
-      if (!rows.length) {
-        return Promise.reject({ status: 404, msg: "article does not exist" });
+      if (rows.length) {
+        return rows;
+      } else {
+        return checkArticleExists(id).then(exists => {
+          if (exists) return rows;
+        });
       }
-      return rows;
     });
 };
