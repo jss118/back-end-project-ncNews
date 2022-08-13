@@ -20,3 +20,13 @@ exports.checkUsernameExists = async username => {
   }
   return true;
 };
+
+exports.checkTopicExists = async topic => {
+  const dbOutput = await db.query("SELECT * FROM articles WHERE topic = $1", [
+    topic,
+  ]);
+  if (dbOutput.rows.length === 0) {
+    return false;
+  }
+  return true;
+};
