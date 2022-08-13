@@ -49,16 +49,19 @@ describe("GET /api/articles/:article_id", () => {
     expect(body.votes).toEqual(expect.any(Number));
     expect(body.comment_count).toEqual(expect.any(Number));
   });
+
   test("Status: 200 Gets an article object which now includes a comment_count property with the value of the total amount of comments for the article with the same article_id", async () => {
     const {
       body: { comment_count },
     } = await request(app).get("/api/articles/1").expect(200);
     expect(comment_count).toBe(11);
   });
+
   test("Status: 400 recieves an error when a bad request is made", async () => {
     const { body } = await request(app).get("/api/articles/one").expect(400);
     expect(body.msg).toBe("Bad request");
   });
+
   test("Status: 404 with an error message for a valid, but none-existing endpoint", async () => {
     const { body } = await request(app).get("/api/articles/1000").expect(404);
 
@@ -141,6 +144,107 @@ describe("GET /api/articles", () => {
     expect(body).toBeSortedBy("created_at", {
       descending: true,
     });
+  });
+
+  test("Status: 200 responds with an array of articles sorted by the title column", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200);
+    expect(body).toBeSortedBy("title", { descending: true });
+  });
+
+  test("Status: 200 responds with an array of articles sorted by the topic column", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200);
+    expect(body).toBeSortedBy("topic", { descending: true });
+  });
+
+  test("Status: 200 responds with an array of articles sorted by the author column", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200);
+    expect(body).toBeSortedBy("author", { descending: true });
+  });
+
+  test("Status: 200 responds with an array of articles sorted by the created_at column", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200);
+    expect(body).toBeSortedBy("created_at", { descending: true });
+  });
+
+  test("Status: 200 responds with an array of articles sorted by the votes column", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200);
+    expect(body).toBeSortedBy("votes", { descending: true });
+  });
+
+  test("Status: 200 responds with an array of articles sorted by the comment_count column", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200);
+    expect(body).toBeSortedBy("comment_count", { descending: true });
+  });
+
+  test("Status: 200 responds with an array of articles sorted by the article_id column", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=article_id")
+      .expect(200);
+    expect(body).toBeSortedBy("article_id", { descending: true });
+  });
+
+  test("Status: 400 responds with an error for anything other than the existing article columns", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=article_number")
+      .expect(400);
+    expect(body.msg).toBe("Invalid Query");
+  });
+
+  test("Status: 200 responds with an array of the articles in ascending order", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=comment_count&order=asc")
+      .expect(200);
+    expect(body).toBeSortedBy("comment_count", { descending: false });
+  });
+
+  test("Status: 200 responds with an array of the articles in descending order", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?order=desc")
+      .expect(200);
+    expect(body).toBeSortedBy("created_at", { descending: true });
+  });
+
+  test("Status: 400 responds with an error if the order query contains an invalid order", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?order=random")
+      .expect(400);
+    expect(body.msg).toBe("Invalid Query");
+  });
+
+  test("Status: 200 responds with an array of articles matching the topic query", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200);
+    body.forEach(article => {
+      expect(article.topic).toBe("cats");
+    });
+  });
+
+  test("Status: 200 responds with an array of articles sorted by the comment_count, in ascending order and matching the topic query", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=comment_count&order=asc&topic=mitch")
+      .expect(200);
+    expect(body).toBeSortedBy("comment_count");
+    body.forEach(article => expect(article.topic).toBe("mitch"));
+  });
+
+  test("Status: 404 responds with an error if the topic does not exist", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?topic=pizza")
+      .expect(404);
+    expect(body.msg).toBe("topic does not exist");
   });
 });
 

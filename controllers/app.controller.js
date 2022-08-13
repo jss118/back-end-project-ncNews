@@ -35,12 +35,18 @@ exports.getUsers = (req, res) => {
   fetchUsers().then(users => res.send(users));
 };
 
-exports.getArticles = (req, res) => {
-  fetchArticles().then(articles => res.send(articles));
+exports.getArticles = (req, res, next) => {
+  const column = req.query.sort_by;
+  const order = req.query.order;
+  const topic = req.query.topic;
+
+  fetchArticles(column, order, topic)
+    .then(articles => res.send(articles))
+    .catch(err => next(err));
 };
 
 exports.getComments = (req, res, next) => {
-  const id = req.params.article;
+  const id = req.params.article_id;
   fetchComments(id)
     .then(comments => res.send(comments))
     .catch(err => {
