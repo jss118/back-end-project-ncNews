@@ -335,3 +335,21 @@ describe("POST /api/articles/:article_id/comments", () => {
     expect(body.msg).toBe("Bad request");
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("Status: 204 responds with no content", async () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("Status: 400 responds with an error for a bad request", async () => {
+    const { body } = await request(app)
+      .delete("/api/comments/commentOne")
+      .expect(400);
+    expect(body.msg).toBe("Bad request");
+  });
+  test("Status: 404 responds with an error for a valid but non-existing comment", async () => {
+    const { body } = await request(app)
+      .delete("/api/comments/1000")
+      .expect(404);
+    expect(body.msg).toBe("Comment does not exist");
+  });
+});

@@ -7,6 +7,7 @@ const {
   fetchArticles,
   fetchComments,
   sendComment,
+  removeComment,
 } = require("../models/app.model");
 
 exports.getTopics = (req, res) => {
@@ -60,5 +61,13 @@ exports.postComment = (req, res, next) => {
 
   sendComment(id, comment)
     .then(([sentComment]) => res.status(201).send(sentComment))
+    .catch(err => next(err));
+};
+
+exports.deleteComment = (req, res, next) => {
+  const id = req.params.comment_id;
+
+  removeComment(id)
+    .then(() => res.sendStatus(204))
     .catch(err => next(err));
 };

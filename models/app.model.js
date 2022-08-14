@@ -3,6 +3,7 @@ const {
   checkArticleExists,
   checkUsernameExists,
   checkTopicExists,
+  checkCommentExists,
 } = require("../dbUtils/dbUtils");
 
 exports.fetchTopics = () => {
@@ -39,9 +40,7 @@ exports.fetchUpdatedArticle = (id, votes) => {
 };
 
 exports.fetchUsers = () => {
-  return db.query("SELECT * FROM users;").then(({ rows }) => {
-    return rows;
-  });
+  return db.query("SELECT * FROM users;").then(({ rows }) => rows);
 };
 
 exports.fetchArticles = async (column, order, topic) => {
@@ -112,4 +111,9 @@ exports.sendComment = (id, comment) => {
       );
     })
     .then(({ rows }) => rows);
+};
+
+exports.removeComment = async id => {
+  commentExists = await checkCommentExists(id);
+  return db.query("DELETE FROM comments WHERE comment_id = $1;", [id]);
 };
