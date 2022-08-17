@@ -249,7 +249,7 @@ describe("GET /api/articles", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("Status: 200 responds with array of comment objects, all of which the article_id matches the id in the end point", async () => {
+  test("Status: 200 responds with array of comment objects, all of which the article_id matches the id query", async () => {
     const { body } = await request(app)
       .get("/api/articles/1/comments")
       .expect(200);
@@ -351,5 +351,13 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/1000")
       .expect(404);
     expect(body.msg).toBe("Comment does not exist");
+  });
+});
+
+describe("GET /api", () => {
+  test("Status: 200 responds with JSON object describing all api endpoints", async () => {
+    const { body } = await request(app).get("/api").expect(200);
+    expect(typeof body).toBe("object");
+    expect(Object.keys(body).length).toBe(9);
   });
 });

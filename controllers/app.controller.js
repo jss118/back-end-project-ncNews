@@ -1,4 +1,5 @@
-const e = require("express");
+const jsonFile = require("../endpoints.json");
+
 const {
   fetchTopics,
   fetchArticle,
@@ -70,4 +71,8 @@ exports.deleteComment = (req, res, next) => {
   removeComment(id)
     .then(() => res.sendStatus(204))
     .catch(err => next(err));
+};
+
+exports.fetchApi = (req, res) => {
+  res.send(jsonFile);
 };
