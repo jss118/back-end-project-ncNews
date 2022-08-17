@@ -114,6 +114,6 @@ exports.sendComment = (id, comment) => {
 };
 
 exports.removeComment = async id => {
-  commentExists = await checkCommentExists(id);
+  await checkCommentExists(id);
   return db.query("DELETE FROM comments WHERE comment_id = $1;", [id]);
 };
