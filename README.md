@@ -1,8 +1,16 @@
-## BE NC-NEWS
+# NC News Backend
+
+Hello!
+
+This is the backend for my Northcoders project, NC News.  NC News is an application in which a user can view various articles, sort articles by topic, votes, comment counts and other sorting methods. 
+
+This is my first API, hosted with Heroku: https://nc-articles-app.herokuapp.com/api
 
 ## Connect to the databases
 
-'.env.\*' has been added to the .gitignore, anyone who wishes to clone this repo will need to create the environment variables by creating the following files:
+'.env.\*' has been added to the .gitignore. 
+Anyone who wishes to fork and clone this repository will need to run the command: 'npm install' to install the relevant packages. 
+Then you will need to create the environment variables by creating the following files:
 
          - '.env.development'
          - '.env.test'
